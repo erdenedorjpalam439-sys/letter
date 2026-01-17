@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="mn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apology letter</title>
+    <title>Artisanal Wax Stamp Letter</title>
     <!-- React and Babel -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -20,33 +20,22 @@
         }
 
         @keyframes softWiggle {
-            0%, 100% {
-                transform: rotate(0deg);
-            }
-
-            25% {
-                transform: rotate(0.6deg);
-            }
-
-            75% {
-                transform: rotate(-0.6deg);
-            }
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(0.6deg); }
+            75% { transform: rotate(-0.6deg); }
         }
-
-        .animate-soft-wiggle {
-            animation: softWiggle 3s ease-in-out infinite;
-        }
-
+        .animate-soft-wiggle { animation: softWiggle 3s ease-in-out infinite; }
+        
         .letter-reveal {
             transition: transform 2.2s cubic-bezier(0.2, 1, 0.3, 1), opacity 1.2s ease-out;
             will-change: transform, opacity;
         }
-
+        
         .paper-texture {
             background-color: #fdfcf9;
             background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
         }
-
+        
         .particle {
             position: absolute;
             border-radius: 50%;
@@ -57,26 +46,17 @@
         .custom-scroll::-webkit-scrollbar {
             width: 4px;
         }
-
         .custom-scroll::-webkit-scrollbar-track {
             background: rgba(0,0,0,0.02);
         }
-
         .custom-scroll::-webkit-scrollbar-thumb {
             background: rgba(0,0,0,0.1);
             border-radius: 10px;
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(15px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .no-tap-highlight {
@@ -84,30 +64,29 @@
             -webkit-touch-callout: none;
             user-select: none;
         }
-
+        
         .progress-ring {
             transition: stroke-dashoffset 0.1s linear;
         }
 
         /* MS Word-like Formatting */
         .word-paragraph {
-            text-indent: 2.5em;
+            text-indent: 2.5em; 
             text-align: justify;
             line-height: 1.8;
             margin-bottom: 1.2em;
         }
 
-        /* The Final Inquiry Block - Centered and specific spacing */
+        /* The Final Inquiry Block - Exact spacing from Word */
         .final-inquiry {
             text-align: center;
             text-indent: 0;
-            margin-top: 2em;
-            line-height: 1.6;
+            margin-top: 2.5em;
+            line-height: 2;
         }
-
-            .final-inquiry p {
-                margin-bottom: 0.5em;
-            }
+        .final-inquiry p {
+            margin-bottom: 0.8em;
+        }
     </style>
 </head>
 <body>
@@ -125,10 +104,10 @@
             const [isSettled, setIsSettled] = useState(false);
             const [holdProgress, setHoldProgress] = useState(0);
             const [particles, setParticles] = useState([]);
-
-            const sealStateRef = useRef({
-                x: 0, y: 0, rotation: 0, vx: 0, vy: 0, torque: 0,
-                holding: false, progress: 0
+            
+            const sealStateRef = useRef({ 
+                x: 0, y: 0, rotation: 0, vx: 0, vy: 0, torque: 0, 
+                holding: false, progress: 0 
             });
             const sealElementRef = useRef(null);
             const physicsRef = useRef();
@@ -211,7 +190,7 @@
                     if (!isOpen && state.y > 350) setIsOpen(true);
                 }
 
-                setParticles(prev =>
+                setParticles(prev => 
                     prev.map(p => ({
                         ...p, x: p.x + p.vx, y: p.y + p.vy,
                         life: p.life - (deltaTime * 0.001),
@@ -230,7 +209,7 @@
                 if (isOpen) {
                     const timer = setTimeout(() => {
                         setShowLetter(true);
-                        setTimeout(() => setIsSettled(true), 2200);
+                        setTimeout(() => setIsSettled(true), 2200); 
                     }, 600);
                     return () => clearTimeout(timer);
                 }
@@ -243,7 +222,7 @@
             return (
                 <div className="flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden select-none" style={{ perspective: '2000px' }}>
                     <div className="relative group" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => { setIsHovering(false); handleEnd(); }}>
-
+                        
                         <div className="absolute inset-0 pointer-events-none z-[90] overflow-visible" style={{ width: '450px', height: '300px' }}>
                             {particles.map(p => (
                                 <div key={p.id} className="particle" style={{
@@ -261,12 +240,12 @@
                         >
                             <div className="absolute inset-0 bg-gradient-to-br from-[#8b1e1e] to-[#630a0a] rounded-sm shadow-2xl flex items-center justify-center border border-[#4a0d18]">
                                 <div className="absolute inset-0 opacity-15 pointer-events-none mix-blend-overlay" style={{ backgroundImage: `url('https://www.transparenttextures.com/patterns/paper-fibers.png')` }} />
-
+                                
                                 <div className={`absolute left-1/2 -translate-x-1/2 paper-texture shadow-[0_30px_90px_rgba(0,0,0,0.6)] overflow-visible letter-reveal
-                                    ${isSettled
-                                        ? 'opacity-100 translate-y-[-280px] sm:translate-y-[-300px] w-[340px] sm:w-[540px] h-[600px] sm:h-[780px] z-[100] scale-[1.0]'
-                                        : showLetter
-                                            ? 'opacity-100 -translate-y-[520px] sm:-translate-y-[580px] w-[300px] sm:w-[450px] h-[520px] sm:h-[680px] z-[100]'
+                                    ${isSettled 
+                                        ? 'opacity-100 translate-y-[-280px] sm:translate-y-[-300px] w-[340px] sm:w-[540px] h-[600px] sm:h-[780px] z-[100] scale-[1.0]' 
+                                        : showLetter 
+                                            ? 'opacity-100 -translate-y-[520px] sm:-translate-y-[580px] w-[300px] sm:w-[450px] h-[520px] sm:h-[680px] z-[100]' 
                                             : 'opacity-0 translate-y-2 w-32 h-44 z-[5]'
                                     }`}
                                 >
@@ -277,8 +256,8 @@
                                                 {paragraphs.map((p, i) => (
                                                     <p key={i} className="word-paragraph">{p}</p>
                                                 ))}
-
-                                                {/* Final Paragraph spacing exactly as docx */}
+                                                
+                                                {/* Final Paragraph with centering and specific line breaks */}
                                                 <div className="final-inquiry">
                                                     <p>Тэгээд хайраасаа, чамаасаа энэ хүсэлтийг, саналыг дахин гуйя.</p>
                                                     <p>Хүслээ, намайг чиний найз залуу болохыг зөвшөөрч байна уу?</p>
@@ -291,17 +270,17 @@
                                 </div>
 
                                 <div className="absolute inset-0 bg-[#7a1515] z-10" style={{ clipPath: 'polygon(0% 0%, 50% 55%, 100% 0%, 100% 100%, 0% 100%)' }} />
-                                <div className="absolute top-0 w-full h-[60%] bg-[#9c2525] border-b border-black/20 transition-transform duration-[1.5s] ease-in-out"
+                                <div className="absolute top-0 w-full h-[60%] bg-[#9c2525] border-b border-black/20 transition-transform duration-[1.5s] ease-in-out" 
                                     style={{ clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)', transform: isOpen ? 'rotateX(160deg)' : 'rotateX(0deg)', zIndex: isOpen ? 2 : 30, transformOrigin: 'top' }}>
                                         <div className={`absolute inset-0 bg-[#8b1e1e] transition-opacity duration-1000 ${isOpen ? 'opacity-100' : 'opacity-0'}`} />
                                 </div>
                             </div>
 
-                            <div
+                            <div 
                                 ref={sealElementRef}
                                 onMouseDown={handleStart} onTouchStart={handleStart} onMouseUp={handleEnd} onTouchEnd={handleEnd} onMouseLeave={handleEnd}
                                 className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[110] transition-transform duration-500 no-tap-highlight
-                                    ${isHovering && !isSealPopped ? 'scale-[1.1]' : 'scale-100'}
+                                    ${isHovering && !isSealPopped ? 'scale-[1.1]' : 'scale-100'} 
                                     ${isSealPopped ? 'pointer-events-none' : 'cursor-pointer'}`}
                             >
                                 <div className="relative w-24 sm:w-28 h-24 sm:h-28 flex items-center justify-center">
