@@ -27,8 +27,8 @@
         .animate-soft-wiggle { animation: softWiggle 3s ease-in-out infinite; }
         
         .letter-reveal {
-            transition: transform 2.2s cubic-bezier(0.2, 1, 0.3, 1), opacity 1.2s ease-out;
-            will-change: transform, opacity;
+            transition: transform 1.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 1s ease-out, width 1.2s ease, height 1.2s ease;
+            will-change: transform, opacity, width, height;
         }
         
         .paper-texture {
@@ -69,7 +69,7 @@
             transition: stroke-dashoffset 0.1s linear;
         }
 
-        /* MS Word-like Formatting */
+        /* Formatting */
         .word-paragraph {
             text-indent: 2.5em; 
             text-align: justify;
@@ -77,15 +77,16 @@
             margin-bottom: 1.2em;
         }
 
-        /* The Final Inquiry Block - Exact spacing from Word */
         .final-inquiry {
             text-align: center;
             text-indent: 0;
-            margin-top: 2.5em;
+            margin-top: 3em;
+            padding-bottom: 4em;
             line-height: 2;
         }
         .final-inquiry p {
-            margin-bottom: 0.8em;
+            margin-bottom: 1em;
+            font-style: italic;
         }
     </style>
 </head>
@@ -113,8 +114,9 @@
             const physicsRef = useRef();
             const lastTimeRef = useRef(performance.now());
 
-            const SEAL_X = window.innerWidth > 640 ? 225 : 150;
-            const SEAL_Y = window.innerWidth > 640 ? 150 : 100;
+            // Center coords for burst effect
+            const SEAL_X = window.innerWidth / 2;
+            const SEAL_Y = window.innerHeight / 2;
 
             const paragraphs = [
                 `Хамгийн эхлээд хайрт чамаасаа уучлалт хүсье, бас баярласан сэтгэлээ илэрхийлье. Анх 2023 оны өвөл чамайг Хайраа багшийн олимпиадын бэлтгэл дээр харж байлаа, тэр үедээ орос англи хэлэнд аль алинд нь сайн байсан болохоор чинь атаархаж бас өрсөлдөгчөө гэж харж байсан. Тэгээд дүүргийн олимпиадын дүн гараад өөрийнхийгөө чинийхтэй харьцуулж харчихаад… яг юу гэж бодсоноо үнэндээ санахгүй байнаа… мэдээж битүүхэндээ атархааж л байсан байх. Тэгээд улсын олимпиад дээр чамайг ганцаараа сургуулийн гадаа хүлээгээд сууж байхыг чинь хараад жаахан санаа зовж байсан…`,
@@ -143,14 +145,14 @@
 
             const triggerBurst = () => {
                 const burst = [];
-                for (let i = 0; i < 35; i++) {
-                    const angle = (i / 35) * Math.PI * 2;
-                    const speed = 2 + Math.random() * 4;
+                for (let i = 0; i < 40; i++) {
+                    const angle = (i / 40) * Math.PI * 2;
+                    const speed = 3 + Math.random() * 6;
                     burst.push({
-                        id: Math.random(), x: SEAL_X, y: SEAL_Y,
+                        id: Math.random(), x: window.innerWidth / 2, y: window.innerHeight / 2,
                         vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-                        size: 2 + Math.random() * 3, color: i % 2 === 0 ? '#f472b6' : '#db2777',
-                        life: 1.2, decay: 0.015, type: 'burst'
+                        size: 2 + Math.random() * 4, color: i % 2 === 0 ? '#f472b6' : '#db2777',
+                        life: 1.5, decay: 0.012, type: 'burst'
                     });
                 }
                 setParticles(prev => [...prev, ...burst]);
@@ -162,32 +164,32 @@
                 const state = sealStateRef.current;
 
                 if (state.holding && !isCompleted) {
-                    state.progress = Math.min(100, state.progress + (deltaTime * 0.08));
+                    state.progress = Math.min(100, state.progress + (deltaTime * 0.09));
                     setHoldProgress(state.progress);
                     if (state.progress >= 100) {
                         setIsCompleted(true);
                         triggerBurst();
                         setTimeout(() => {
                             setIsSealPopped(true);
-                            state.vx = (Math.random() - 0.5) * 12;
-                            state.vy = -20;
-                            state.torque = (Math.random() - 0.5) * 30;
+                            state.vx = (Math.random() - 0.5) * 15;
+                            state.vy = -25;
+                            state.torque = (Math.random() - 0.5) * 40;
                         }, 200);
                     }
                 } else if (!isCompleted) {
-                    state.progress = Math.max(0, state.progress - (deltaTime * 0.15));
+                    state.progress = Math.max(0, state.progress - (deltaTime * 0.2));
                     setHoldProgress(state.progress);
                 }
 
                 if (isSealPopped && sealElementRef.current) {
-                    state.vy += 0.7;
-                    state.vx *= 0.99;
-                    state.torque *= 0.99;
+                    state.vy += 0.8;
+                    state.vx *= 0.98;
+                    state.torque *= 0.98;
                     state.x += state.vx;
                     state.y += state.vy;
                     state.rotation += state.torque;
                     sealElementRef.current.style.transform = `translate3d(calc(-50% + ${state.x}px), calc(-50% + ${state.y}px), 0) rotate(${state.rotation}deg)`;
-                    if (!isOpen && state.y > 350) setIsOpen(true);
+                    if (!isOpen && state.y > 300) setIsOpen(true);
                 }
 
                 setParticles(prev => 
@@ -209,8 +211,8 @@
                 if (isOpen) {
                     const timer = setTimeout(() => {
                         setShowLetter(true);
-                        setTimeout(() => setIsSettled(true), 2200); 
-                    }, 600);
+                        setTimeout(() => setIsSettled(true), 1800); 
+                    }, 500);
                     return () => clearTimeout(timer);
                 }
             }, [isOpen]);
@@ -220,81 +222,89 @@
             const strokeDashoffset = circumference - (holdProgress / 100) * circumference;
 
             return (
-                <div className="flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden select-none" style={{ perspective: '2000px' }}>
-                    <div className="relative group" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => { setIsHovering(false); handleEnd(); }}>
+                <div className="flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden select-none bg-[#1c1917]" style={{ perspective: '2000px' }}>
+                    <div className="relative w-full h-full flex items-center justify-center">
                         
-                        <div className="absolute inset-0 pointer-events-none z-[90] overflow-visible" style={{ width: '450px', height: '300px' }}>
+                        {/* Particles Layer */}
+                        <div className="fixed inset-0 pointer-events-none z-[200]">
                             {particles.map(p => (
                                 <div key={p.id} className="particle" style={{
                                     width: `${p.size}px`, height: `${p.size}px`, left: `${p.x}px`, top: `${p.y}px`,
                                     backgroundColor: p.color, opacity: p.life,
                                     boxShadow: `0 0 ${p.size * 2}px ${p.color}`,
-                                    transform: `scale(${p.life})`,
+                                    transform: `translate(-50%, -50%) scale(${p.life})`,
                                 }} />
                             ))}
                         </div>
 
-                        <div className={`relative w-[300px] sm:w-[450px] h-[200px] sm:h-[300px] transition-all duration-1000 z-30
+                        {/* Envelope & Letter Container */}
+                        <div className={`relative w-[300px] sm:w-[460px] h-[220px] sm:h-[320px] transition-all duration-1000 z-30 flex items-center justify-center
                             ${isHovering && !isSealPopped ? 'animate-soft-wiggle' : ''}
-                            ${isOpen ? 'scale-[0.5] sm:scale-[0.55] translate-y-72 sm:translate-y-80' : 'scale-100 translate-y-0'}`}
+                            ${isOpen ? 'translate-y-[200px] scale-[0.5]' : 'scale-100 translate-y-0'}`}
                         >
-                            <div className="absolute inset-0 bg-gradient-to-br from-[#8b1e1e] to-[#630a0a] rounded-sm shadow-2xl flex items-center justify-center border border-[#4a0d18]">
+                            {/* Envelope Base */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-[#8b1e1e] to-[#630a0a] rounded shadow-2xl border border-[#4a0d18] z-20">
                                 <div className="absolute inset-0 opacity-15 pointer-events-none mix-blend-overlay" style={{ backgroundImage: `url('https://www.transparenttextures.com/patterns/paper-fibers.png')` }} />
                                 
-                                <div className={`absolute left-1/2 -translate-x-1/2 paper-texture shadow-[0_30px_90px_rgba(0,0,0,0.6)] overflow-visible letter-reveal
-                                    ${isSettled 
-                                        ? 'opacity-100 translate-y-[-280px] sm:translate-y-[-300px] w-[340px] sm:w-[540px] h-[600px] sm:h-[780px] z-[100] scale-[1.0]' 
-                                        : showLetter 
-                                            ? 'opacity-100 -translate-y-[520px] sm:-translate-y-[580px] w-[300px] sm:w-[450px] h-[520px] sm:h-[680px] z-[100]' 
-                                            : 'opacity-0 translate-y-2 w-32 h-44 z-[5]'
-                                    }`}
-                                >
-                                    <div className="absolute inset-0 border border-black/5 pointer-events-none z-10" />
-                                    <div className="relative h-full flex flex-col py-8 sm:py-12">
-                                        <div className="flex-1 overflow-y-auto custom-scroll px-6 sm:px-14 relative" style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}>
-                                            <div className="text-stone-700 text-[14px] sm:text-[16px] transition-opacity duration-700 pb-16" style={{ animation: 'fadeIn 1.5s ease-out forwards' }}>
-                                                {paragraphs.map((p, i) => (
-                                                    <p key={i} className="word-paragraph">{p}</p>
-                                                ))}
-                                                
-                                                {/* Final Paragraph with centering and specific line breaks */}
-                                                <div className="final-inquiry">
-                                                    <p>Тэгээд хайраасаа, чамаасаа энэ хүсэлтийг, саналыг дахин гуйя.</p>
-                                                    <p>Хүслээ, намайг чиний найз залуу болохыг зөвшөөрч байна уу?</p>
-                                                    <p>Өхөөрдөм чинийхээ инээмсэглэлийг дахин харахын тулд, ялдам зөөлөн хоолойг чинь дахин сонсохын тулд, чамайгаа дахин тэврэхийн тулд хайрт минь.</p>
-                                                </div>
-                                            </div>
-                                            <div className="sticky bottom-0 left-0 w-full h-12 bg-gradient-to-t from-[#fdfcf9] to-transparent pointer-events-none" />
-                                        </div>
-                                    </div>
-                                </div>
-
+                                {/* Inner Flap Decoration */}
                                 <div className="absolute inset-0 bg-[#7a1515] z-10" style={{ clipPath: 'polygon(0% 0%, 50% 55%, 100% 0%, 100% 100%, 0% 100%)' }} />
-                                <div className="absolute top-0 w-full h-[60%] bg-[#9c2525] border-b border-black/20 transition-transform duration-[1.5s] ease-in-out" 
-                                    style={{ clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)', transform: isOpen ? 'rotateX(160deg)' : 'rotateX(0deg)', zIndex: isOpen ? 2 : 30, transformOrigin: 'top' }}>
+                                
+                                {/* Top Flap Animation */}
+                                <div className="absolute top-0 w-full h-[60%] bg-[#9c2525] border-b border-black/20 transition-transform duration-[1.2s] ease-in-out" 
+                                    style={{ clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)', transform: isOpen ? 'rotateX(180deg)' : 'rotateX(0deg)', zIndex: isOpen ? 5 : 40, transformOrigin: 'top' }}>
                                         <div className={`absolute inset-0 bg-[#8b1e1e] transition-opacity duration-1000 ${isOpen ? 'opacity-100' : 'opacity-0'}`} />
                                 </div>
                             </div>
 
+                            {/* The Actual Letter */}
+                            <div className={`absolute left-1/2 -translate-x-1/2 paper-texture shadow-[0_40px_100px_rgba(0,0,0,0.8)] letter-reveal
+                                ${isSettled 
+                                    ? 'opacity-100 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] sm:w-[600px] h-[85vh] sm:h-[800px] z-[100] scale-100 p-1' 
+                                    : showLetter 
+                                        ? 'opacity-100 -translate-y-[110%] w-[280px] sm:w-[420px] h-[400px] sm:h-[600px] z-10' 
+                                        : 'opacity-0 translate-y-0 w-32 h-20 z-0'
+                                }`}
+                            >
+                                <div className="absolute inset-0 border border-black/10 pointer-events-none z-10 m-1" />
+                                <div className="relative h-full flex flex-col py-8 sm:py-14">
+                                    <div className="flex-1 overflow-y-auto custom-scroll px-6 sm:px-16 relative" style={{ WebkitOverflowScrolling: 'touch' }}>
+                                        <div className="text-stone-700 text-[15px] sm:text-[18px] transition-opacity duration-700 pb-20" style={{ animation: 'fadeIn 1.2s ease-out forwards' }}>
+                                            {paragraphs.map((p, i) => (
+                                                <p key={i} className="word-paragraph">{p}</p>
+                                            ))}
+                                            
+                                            <div className="final-inquiry">
+                                                <p>Тэгээд хайраасаа, чамаасаа энэ хүсэлтийг, саналыг дахин гуйя.</p>
+                                                <p>Хүслээ, намайг чиний найз залуу болохыг зөвшөөрч байна уу?</p>
+                                                <p>Өхөөрдөм чинийхээ инээмсэглэлийг дахин харахын тулд, ялдам зөөлөн хоолойг чинь дахин сонсохын тулд, чамайгаа дахин тэврэхийн тулд хайрт минь.</p>
+                                            </div>
+                                        </div>
+                                        {/* Bottom Fade Gradient for better scrolling visuals */}
+                                        <div className="sticky bottom-0 left-0 w-full h-16 bg-gradient-to-t from-[#fdfcf9] to-transparent pointer-events-none" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Seal Wax - Interactive */}
                             <div 
                                 ref={sealElementRef}
                                 onMouseDown={handleStart} onTouchStart={handleStart} onMouseUp={handleEnd} onTouchEnd={handleEnd} onMouseLeave={handleEnd}
                                 className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[110] transition-transform duration-500 no-tap-highlight
-                                    ${isHovering && !isSealPopped ? 'scale-[1.1]' : 'scale-100'} 
+                                    ${isHovering && !isSealPopped ? 'scale-[1.15]' : 'scale-100'} 
                                     ${isSealPopped ? 'pointer-events-none' : 'cursor-pointer'}`}
                             >
-                                <div className="relative w-24 sm:w-28 h-24 sm:h-28 flex items-center justify-center">
+                                <div className="relative w-28 sm:w-32 h-28 sm:h-32 flex items-center justify-center">
                                     {holdProgress > 0 && !isCompleted && (
-                                        <svg className="absolute inset-0 w-full h-full -rotate-90 z-50 overflow-visible pointer-events-none">
-                                            <circle cx="50%" cy="50%" r={radius} fill="transparent" stroke="rgba(255, 183, 197, 0.2)" strokeWidth="5" />
-                                            <circle className="progress-ring" cx="50%" cy="50%" r={radius} fill="transparent" stroke="#ffb7c5" strokeWidth="5" strokeDasharray={circumference}
+                                        <svg className="absolute inset-0 w-full h-full -rotate-90 z-50 overflow-visible pointer-events-none scale-110">
+                                            <circle cx="50%" cy="50%" r={radius} fill="transparent" stroke="rgba(255, 183, 197, 0.2)" strokeWidth="4" />
+                                            <circle className="progress-ring" cx="50%" cy="50%" r={radius} fill="transparent" stroke="#ffb7c5" strokeWidth="4" strokeDasharray={circumference}
                                                 style={{ strokeDashoffset }} strokeLinecap="round" />
                                         </svg>
                                     )}
-                                    <div className="relative w-18 sm:w-22 h-18 sm:h-22 flex items-center justify-center">
+                                    <div className="relative w-20 sm:w-24 h-20 sm:h-24 flex items-center justify-center">
                                         <div className="absolute inset-0 bg-gradient-to-br from-[#ffb7c5] to-[#ff66a3] rounded-[45%_55%_50%_48%] rotate-[20deg] shadow-2xl" />
-                                        <div className="relative z-10 w-14 sm:w-16 h-14 sm:h-16 rounded-full flex items-center justify-center" style={{ background: 'radial-gradient(circle at 40% 40%, #ff85b3 0%, #db2777 100%)', boxShadow: 'inset 4px 4px 10px rgba(0,0,0,0.3)' }}>
-                                            <svg viewBox="0 0 24 24" className="w-8 sm:w-10 h-8 sm:h-10 text-[#701a41] opacity-60" fill="currentColor">
+                                        <div className="relative z-10 w-16 sm:w-20 h-16 sm:h-20 rounded-full flex items-center justify-center" style={{ background: 'radial-gradient(circle at 40% 40%, #ff85b3 0%, #db2777 100%)', boxShadow: 'inset 4px 4px 12px rgba(0,0,0,0.4)' }}>
+                                            <svg viewBox="0 0 24 24" className="w-10 sm:w-12 h-10 sm:h-12 text-[#701a41] opacity-70" fill="currentColor">
                                                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                                             </svg>
                                         </div>
@@ -302,9 +312,11 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div className={`mt-56 text-stone-500 text-[10px] tracking-[0.4em] transition-opacity duration-1000 ${isSettled ? 'opacity-0' : 'opacity-100'} uppercase font-sans text-center px-4`}>
-                        Hold the seal to open
+
+                        {/* Helper Text */}
+                        <div className={`fixed bottom-12 left-0 w-full text-stone-500 text-[11px] tracking-[0.5em] transition-opacity duration-1000 ${isSettled ? 'opacity-0' : 'opacity-100'} uppercase font-sans text-center px-4 z-50`}>
+                            Hold the wax seal to reveal
+                        </div>
                     </div>
                 </div>
             );
