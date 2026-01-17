@@ -1,0 +1,338 @@
+﻿<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Apology letter</title>
+    <!-- React and Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #1c1917;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            touch-action: none;
+        }
+
+        @keyframes softWiggle {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(0.6deg);
+            }
+
+            75% {
+                transform: rotate(-0.6deg);
+            }
+        }
+
+        .animate-soft-wiggle {
+            animation: softWiggle 3s ease-in-out infinite;
+        }
+
+        .letter-reveal {
+            transition: transform 2.2s cubic-bezier(0.2, 1, 0.3, 1), opacity 1.2s ease-out;
+            will-change: transform, opacity;
+        }
+
+        .paper-texture {
+            background-color: #fdfcf9;
+            background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            will-change: transform, opacity;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.02);
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .no-tap-highlight {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+
+        .progress-ring {
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+        /* MS Word-like Formatting */
+        .word-paragraph {
+            text-indent: 2.5em;
+            text-align: justify;
+            line-height: 1.8;
+            margin-bottom: 1.2em;
+        }
+
+        /* The Final Inquiry Block - Centered and specific spacing */
+        .final-inquiry {
+            text-align: center;
+            text-indent: 0;
+            margin-top: 2em;
+            line-height: 1.6;
+        }
+
+            .final-inquiry p {
+                margin-bottom: 0.5em;
+            }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const App = () => {
+            const [isHovering, setIsHovering] = useState(false);
+            const [isCompleted, setIsCompleted] = useState(false);
+            const [isSealPopped, setIsSealPopped] = useState(false);
+            const [isOpen, setIsOpen] = useState(false);
+            const [showLetter, setShowLetter] = useState(false);
+            const [isSettled, setIsSettled] = useState(false);
+            const [holdProgress, setHoldProgress] = useState(0);
+            const [particles, setParticles] = useState([]);
+
+            const sealStateRef = useRef({
+                x: 0, y: 0, rotation: 0, vx: 0, vy: 0, torque: 0,
+                holding: false, progress: 0
+            });
+            const sealElementRef = useRef(null);
+            const physicsRef = useRef();
+            const lastTimeRef = useRef(performance.now());
+
+            const SEAL_X = window.innerWidth > 640 ? 225 : 150;
+            const SEAL_Y = window.innerWidth > 640 ? 150 : 100;
+
+            const paragraphs = [
+                `Хамгийн эхлээд хайрт чамаасаа уучлалт хүсье, бас баярласан сэтгэлээ илэрхийлье. Анх 2023 оны өвөл чамайг Хайраа багшийн олимпиадын бэлтгэл дээр харж байлаа, тэр үедээ орос англи хэлэнд аль алинд нь сайн байсан болохоор чинь атаархаж бас өрсөлдөгчөө гэж харж байсан. Тэгээд дүүргийн олимпиадын дүн гараад өөрийнхийгөө чинийхтэй харьцуулж харчихаад… яг юу гэж бодсоноо үнэндээ санахгүй байнаа… мэдээж битүүхэндээ атархааж л байсан байх. Тэгээд улсын олимпиад дээр чамайг ганцаараа сургуулийн гадаа хүлээгээд сууж байхыг чинь хараад жаахан санаа зовж байсан…`,
+                `Тэгээд хичээл ороод Хайраа багшийн давтлагад нь туслах багш хийж байхдаа, 9-ийн и-ийн хүүхдүүд гэж мэдээд чамайг суухгүй юм байх даа гэж нэлээд хүсэж хүлээж байсан… үнэндээ жаахан smug царайлъя гэж бодсон л доо, гэхдээ чиний тухай мэдэхийг бас хүссэн. Тэгээд хичээлийн шинэ жил дуусч хонхны баяр болов оо, сургууль дээр болсон нээлт ч гэх үү хаалтан дээр чамайг анзаарч хараагүй ч гэсэн орой/өдөр нь шагнал гардуулж байхал нь чамайг, үнэндээ хальт л даа, гэхдээ л харж байсан.`,
+                `Дараа нь дуу хуур, бүжиг цэнгүүн дуусаад тэр хавиар хийцгүйрч явж байгаад заал руу нь орсон чинь танай ангийнхан ангиараа зургаа авахуулж байхад нь таараад, чамайг одооо бодох нь ээ, юу өмссөн байсныг чинь бүдэг бадаг л санадаг ч гэсэн хөөрхөн харагдаж байсныг чинь тод санадаг л даа. Тэгээд 10-р анги эхэлж чамайг ангид байгааг мэдээд бага багаар ажиглаж эхэлсэн… өрсөлдөгч гэж харсаар бусад хичээлдээ ч сайн гэдгийг чинь, ялангуяа Одгэ багшийн хичээл дээр “Чинхүслээн” гээд л багш чамайг дуудаад эссэг чинь магтаж, засаж өгөөд л, тэр үед чиний жаахан эв дүйгүй ч гэлээ өхөөрдөм үйл хөдлөл чинь нүдэнд тусдаг байлаа…`,
+                `Дараа нь химийн хичээл/цаг дээр цуг суугаад л, эхэндээ чамайг Мичидмаатай юм яриад эсвэл хичээлээ чимээгүйхэн хийхийг чинь хааяа даа хардаг байгаад, туршилт хийж эхлээд, чамтайгаа хааяа даа үг солилцоод тэгсээр чамайг арай их хардаг болов оо. Тэгэж тэгсээр хавар болж гадуур явахдаа чамайг надтай таарчихаад зугтахаар чинь надад crush-тай юм болов уу гэж бодсоор чамдаа ч гэсэн битүүхэндээ сэтгэлтэй болж эхэлсэн дээ...`,
+                `Харин чамтайгаа анх удаагаа ярилцаж үзсэн нь энэ зун 7-р сарын 4-нд, ээж хагалгааны өрөө рүүгээ орчихоор нь гадаа нь хүлээж суунгаа чиний messenger дээрх note рүү чинь language гэж хариулаад, тэр л ганцхан үгнээс эхлээд нэг цаг хагас хэрийн туршид их хөгжилтэй бас их сэтгэлд хоногшсон яриа өрнүүлж билээ. Харин чамайг завгүй болоод үргэлжлүүлэн ярьж чадахгүй болоход чинь дотроо жаахан ч гэсэн гуниглаж байлаа...`,
+                `Ээж ч эмнэлгээсээ гараад, гэртээ хариад яагаад ч юм чамтай дахин дахин ярилцахын хүслэн болсоор нэгэн аргыг сэдэв ээ. Чамаар зураг зуруулах нэрийдлээр... зураг зуруулахын л тулд шүү... мэдээж чамтайгаа дахин дахин ярилцахыг, чиний өөрийн гэсэн “ертөнц”-ийн тухай мэдэхийг хүссэндээ л. Бодож олсон арга минь ч бүтэж чамтайгаа холбоотой байх “шалтгаан”-тай боллоо, бас тоглоомондоо ашиглах зурагтай.`,
+                `Харин анх удаагаа чамд санаа зовсон минь бол, dude гэж их л сандарсан байдалтай зүг асуухад чинь, хэрэндээ л төөрүүлэхгүйн тулд, хэрэндээ л зөв замаар явуулахын тулд их л бодож бодож, замыг чинь зааж өгөв өө... Утасны чинь цэнэг дуусаж байгаа, бас зүг чигтээ муу гэдгийг чинь санаад, “хайсан газраа олсон болов уу?”, “согтуу, орон гэргүй хүмүүс дээрэлхээгүй байгаа...” гэж санаа зовсоор эцэст нь чамаас минь хариу ирлээ, тэр хол газраас, 10-аад автобусны буудал өнгөрч ирснийг чинь мэдээд, гэртээ аюулгүй ирсэн гэдгийг чинь сонсоод санаа зовинол арилсан ч гэлээ, “алхаж ирээд зөндөө ядарч дээ...”`,
+                `8-р сарын сүүл болж өдөр болгон шахуу чамтайгаа ярилцсаар хичээл орлоо, 9-н сарын 1-нд тэр олон дундаас чамайг олж харчихаад, харцаа салгаж чадалгүй сургуулийн өмнө жагсаж эхэллээ. Сургууль орон ортлоо чамайгаа харсаар, ангид орсон хойноо ч, битүүхэндээ чамайг ойрхон л суугаасай билээ гэж бодож суулаа. Би ганцаараа... чи ангид орж ирээд суудалгүй... яг л цуг суух ёстой шүү гэсэн шиг. Чамтайгаа тохой тохойгоо нийлүүлээд нэгэн ширээний ард суулаа...`,
+                `Мэдээж өмнө нь утасны цаанаас л ярилцаж үзсэн болохоос биш, нүүр тулаад... биес тулаад ярилцахаар, суухаар эвгүй байсан ч гэлээ, чамтай яриа өрнүүлж, хичээл дээр чинь аль болох туслахыг хичээсээр эхний өдөр дууслаа. Хувцасны шүүгээ хуваарилах болж, эхлээд 9-р ангид байдаг байсан шигээ баяс-тай цуг авъя гэж бодож байсан ч, Баяраатай цуг авсныг нь мэдээд боломжийг ашиглаад шууд чамд санал болгож, азаар чи минь ч зөвшөөрч, цаашид цуг суух баталга- ahem… Тэр өдрүүдэд бага багаар дасаж, сэтгэлтэй болсоор чамд сэтгэлээ илчлэхээр шийдлээ. Тэгээд 9-н сарын 15-нд гэрт чинь хүргэж өгөхийг санал болгож, “нэг зүгт явдаг болохоор” чи минь мөн зөвшөөрч, гэр лүү чинь явах замд, үерхэх санал тавихаар төлөвлосон ч гэлээ... гэр лүү чинь явах зам... “богинодоод”...`,
+                `Тэр орой нь чиний минь тавьсан note-ийг хараад “өөр залууд зориулсан бол яах вэ?”, “хэрвээ надад зориулсан бол...” гэж бодсоор сэтгэл зориглон чамд сэтгэлээ илчиллээ... Миний амьдралдаа хамгийн ихээр догдолж, баярлаж байсан өдөр нь маргаангүй тэр л орой...`,
+                `Чамтайгаа үерхэж эхлээд гомдоохгүй юм сан, алдчихгүй юм сан гэж айсаар алдаа гаргаад тэдгээрийгэа мэдсэн ч засаж чадалгүй, тэр хэвээр нь байлгасаар, чамайгаа улам гомдоосноо мэдэлгүй хоосон амлалт өгсөөр хэтэрхий… бүр хэтэрхий уджээ. Нэгэн хэвийн, засагдаагүй алдаануудаа олсон, юуг буруу хийж байснаа ойлгосон, яаж чамайгаа хайрлах ёстойгоо ойлгосон. Хайр нь болоогүй зүйлсийн тухай бодсоор, бодох бодохдоо харанхуй талаас нь хэт ургуулж бодсоор “одоо”-оо сүйрүүлжээ.`,
+                `Иймээс хайр нь болоогүй ирээдүйд биш зөвхөн чамдаа анхаарч, сэтгэл зүйгээ ч бас тогтвортой байлганаа. Миний хайр хүсээгүй байхад нь заримдаа хэт их тулгаж шахдгаа ч мөн засна аа. Хэдийгээр хэн хэнийхээ гаргасан алдаа, тэдгээрийг яаж засах тухай гэсэн ч гэлээ, чинийхээ гаргасан үйлдэл болгоныг шалтгаантай гэж бодож байгаа болохоор... хэрвээ бичихгүй бол яг буцаагдах байх аа... Бага багаар зайгаа авахын оронд юу бодож байгаагаа хэлсэн бол... гэхдээ өмнө нь хэлж байхад нь алдаагааа засаагүй нь би болохоор чиний минь алдаа биш ээ.`,
+                `Би өөрийгөө засаад гэсэн ч гэлээ, алдаагаа, буруу хийсэн зүйлсээ засаж байгаа болохоор, би “би” хэвээрээ л байх болохоор чамд минь санаа зовох зүйл байхгүй ээ. Мөн өмнөх шигээ чамайгаа завгүй байхад нь зогсоо зайгүй хариу бичихийг мөн өөр өөр зүйлг шаардохгүй учраас чам дээр минь ирэх даралт нь бага ч болов багасна хэмээн найдаж байна хайрт минь.`,
+            ];
+
+            const handleStart = (e) => {
+                if (isCompleted || isSealPopped) return;
+                sealStateRef.current.holding = true;
+            };
+
+            const handleEnd = () => {
+                sealStateRef.current.holding = false;
+            };
+
+            const triggerBurst = () => {
+                const burst = [];
+                for (let i = 0; i < 35; i++) {
+                    const angle = (i / 35) * Math.PI * 2;
+                    const speed = 2 + Math.random() * 4;
+                    burst.push({
+                        id: Math.random(), x: SEAL_X, y: SEAL_Y,
+                        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+                        size: 2 + Math.random() * 3, color: i % 2 === 0 ? '#f472b6' : '#db2777',
+                        life: 1.2, decay: 0.015, type: 'burst'
+                    });
+                }
+                setParticles(prev => [...prev, ...burst]);
+            };
+
+            const loop = (time) => {
+                const deltaTime = time - lastTimeRef.current;
+                lastTimeRef.current = time;
+                const state = sealStateRef.current;
+
+                if (state.holding && !isCompleted) {
+                    state.progress = Math.min(100, state.progress + (deltaTime * 0.08));
+                    setHoldProgress(state.progress);
+                    if (state.progress >= 100) {
+                        setIsCompleted(true);
+                        triggerBurst();
+                        setTimeout(() => {
+                            setIsSealPopped(true);
+                            state.vx = (Math.random() - 0.5) * 12;
+                            state.vy = -20;
+                            state.torque = (Math.random() - 0.5) * 30;
+                        }, 200);
+                    }
+                } else if (!isCompleted) {
+                    state.progress = Math.max(0, state.progress - (deltaTime * 0.15));
+                    setHoldProgress(state.progress);
+                }
+
+                if (isSealPopped && sealElementRef.current) {
+                    state.vy += 0.7;
+                    state.vx *= 0.99;
+                    state.torque *= 0.99;
+                    state.x += state.vx;
+                    state.y += state.vy;
+                    state.rotation += state.torque;
+                    sealElementRef.current.style.transform = `translate3d(calc(-50% + ${state.x}px), calc(-50% + ${state.y}px), 0) rotate(${state.rotation}deg)`;
+                    if (!isOpen && state.y > 350) setIsOpen(true);
+                }
+
+                setParticles(prev =>
+                    prev.map(p => ({
+                        ...p, x: p.x + p.vx, y: p.y + p.vy,
+                        life: p.life - (deltaTime * 0.001),
+                        vx: p.type === 'drift' ? p.vx + Math.sin(time / 600) * 0.02 : p.vx
+                    })).filter(p => p.life > 0)
+                );
+                physicsRef.current = requestAnimationFrame(loop);
+            };
+
+            useEffect(() => {
+                physicsRef.current = requestAnimationFrame(loop);
+                return () => cancelAnimationFrame(physicsRef.current);
+            }, [isCompleted, isSealPopped, isOpen]);
+
+            useEffect(() => {
+                if (isOpen) {
+                    const timer = setTimeout(() => {
+                        setShowLetter(true);
+                        setTimeout(() => setIsSettled(true), 2200);
+                    }, 600);
+                    return () => clearTimeout(timer);
+                }
+            }, [isOpen]);
+
+            const radius = 45;
+            const circumference = 2 * Math.PI * radius;
+            const strokeDashoffset = circumference - (holdProgress / 100) * circumference;
+
+            return (
+                <div className="flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden select-none" style={{ perspective: '2000px' }}>
+                    <div className="relative group" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => { setIsHovering(false); handleEnd(); }}>
+
+                        <div className="absolute inset-0 pointer-events-none z-[90] overflow-visible" style={{ width: '450px', height: '300px' }}>
+                            {particles.map(p => (
+                                <div key={p.id} className="particle" style={{
+                                    width: `${p.size}px`, height: `${p.size}px`, left: `${p.x}px`, top: `${p.y}px`,
+                                    backgroundColor: p.color, opacity: p.life,
+                                    boxShadow: `0 0 ${p.size * 2}px ${p.color}`,
+                                    transform: `scale(${p.life})`,
+                                }} />
+                            ))}
+                        </div>
+
+                        <div className={`relative w-[300px] sm:w-[450px] h-[200px] sm:h-[300px] transition-all duration-1000 z-30
+                            ${isHovering && !isSealPopped ? 'animate-soft-wiggle' : ''}
+                            ${isOpen ? 'scale-[0.5] sm:scale-[0.55] translate-y-72 sm:translate-y-80' : 'scale-100 translate-y-0'}`}
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-[#8b1e1e] to-[#630a0a] rounded-sm shadow-2xl flex items-center justify-center border border-[#4a0d18]">
+                                <div className="absolute inset-0 opacity-15 pointer-events-none mix-blend-overlay" style={{ backgroundImage: `url('https://www.transparenttextures.com/patterns/paper-fibers.png')` }} />
+
+                                <div className={`absolute left-1/2 -translate-x-1/2 paper-texture shadow-[0_30px_90px_rgba(0,0,0,0.6)] overflow-visible letter-reveal
+                                    ${isSettled
+                                        ? 'opacity-100 translate-y-[-280px] sm:translate-y-[-300px] w-[340px] sm:w-[540px] h-[600px] sm:h-[780px] z-[100] scale-[1.0]'
+                                        : showLetter
+                                            ? 'opacity-100 -translate-y-[520px] sm:-translate-y-[580px] w-[300px] sm:w-[450px] h-[520px] sm:h-[680px] z-[100]'
+                                            : 'opacity-0 translate-y-2 w-32 h-44 z-[5]'
+                                    }`}
+                                >
+                                    <div className="absolute inset-0 border border-black/5 pointer-events-none z-10" />
+                                    <div className="relative h-full flex flex-col py-8 sm:py-12">
+                                        <div className="flex-1 overflow-y-auto custom-scroll px-6 sm:px-14 relative" style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}>
+                                            <div className="text-stone-700 text-[14px] sm:text-[16px] transition-opacity duration-700 pb-16" style={{ animation: 'fadeIn 1.5s ease-out forwards' }}>
+                                                {paragraphs.map((p, i) => (
+                                                    <p key={i} className="word-paragraph">{p}</p>
+                                                ))}
+
+                                                {/* Final Paragraph spacing exactly as docx */}
+                                                <div className="final-inquiry">
+                                                    <p>Тэгээд хайраасаа, чамаасаа энэ хүсэлтийг, саналыг дахин гуйя.</p>
+                                                    <p>Хүслээ, намайг чиний найз залуу болохыг зөвшөөрч байна уу?</p>
+                                                    <p>Өхөөрдөм чинийхээ инээмсэглэлийг дахин харахын тулд, ялдам зөөлөн хоолойг чинь дахин сонсохын тулд, чамайгаа дахин тэврэхийн тулд хайрт минь.</p>
+                                                </div>
+                                            </div>
+                                            <div className="sticky bottom-0 left-0 w-full h-12 bg-gradient-to-t from-[#fdfcf9] to-transparent pointer-events-none" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="absolute inset-0 bg-[#7a1515] z-10" style={{ clipPath: 'polygon(0% 0%, 50% 55%, 100% 0%, 100% 100%, 0% 100%)' }} />
+                                <div className="absolute top-0 w-full h-[60%] bg-[#9c2525] border-b border-black/20 transition-transform duration-[1.5s] ease-in-out"
+                                    style={{ clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)', transform: isOpen ? 'rotateX(160deg)' : 'rotateX(0deg)', zIndex: isOpen ? 2 : 30, transformOrigin: 'top' }}>
+                                        <div className={`absolute inset-0 bg-[#8b1e1e] transition-opacity duration-1000 ${isOpen ? 'opacity-100' : 'opacity-0'}`} />
+                                </div>
+                            </div>
+
+                            <div
+                                ref={sealElementRef}
+                                onMouseDown={handleStart} onTouchStart={handleStart} onMouseUp={handleEnd} onTouchEnd={handleEnd} onMouseLeave={handleEnd}
+                                className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[110] transition-transform duration-500 no-tap-highlight
+                                    ${isHovering && !isSealPopped ? 'scale-[1.1]' : 'scale-100'}
+                                    ${isSealPopped ? 'pointer-events-none' : 'cursor-pointer'}`}
+                            >
+                                <div className="relative w-24 sm:w-28 h-24 sm:h-28 flex items-center justify-center">
+                                    {holdProgress > 0 && !isCompleted && (
+                                        <svg className="absolute inset-0 w-full h-full -rotate-90 z-50 overflow-visible pointer-events-none">
+                                            <circle cx="50%" cy="50%" r={radius} fill="transparent" stroke="rgba(255, 183, 197, 0.2)" strokeWidth="5" />
+                                            <circle className="progress-ring" cx="50%" cy="50%" r={radius} fill="transparent" stroke="#ffb7c5" strokeWidth="5" strokeDasharray={circumference}
+                                                style={{ strokeDashoffset }} strokeLinecap="round" />
+                                        </svg>
+                                    )}
+                                    <div className="relative w-18 sm:w-22 h-18 sm:h-22 flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-[#ffb7c5] to-[#ff66a3] rounded-[45%_55%_50%_48%] rotate-[20deg] shadow-2xl" />
+                                        <div className="relative z-10 w-14 sm:w-16 h-14 sm:h-16 rounded-full flex items-center justify-center" style={{ background: 'radial-gradient(circle at 40% 40%, #ff85b3 0%, #db2777 100%)', boxShadow: 'inset 4px 4px 10px rgba(0,0,0,0.3)' }}>
+                                            <svg viewBox="0 0 24 24" className="w-8 sm:w-10 h-8 sm:h-10 text-[#701a41] opacity-60" fill="currentColor">
+                                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={`mt-56 text-stone-500 text-[10px] tracking-[0.4em] transition-opacity duration-1000 ${isSettled ? 'opacity-0' : 'opacity-100'} uppercase font-sans text-center px-4`}>
+                        Hold the seal to open
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
